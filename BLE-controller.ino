@@ -1,4 +1,4 @@
-/**
+  /**
  * A BLE client example that is rich in capabilities. 
  * There is a lot new capabilities implemented.
  * author unknown
@@ -9,8 +9,8 @@
 #include "BLEDevice.h"
 #include <EasyButton.h>
 
-EasyButton button1(15, 50);
-EasyButton button2(13, 50);
+EasyButton button1(15, 50); //button 1 on Pin 15 - debounce 50 ms
+EasyButton button2(13, 50); //button 2 on Pin 13 - debounce 50 ms
 
 // The remote services we wish to connect to.
 static BLEUUID serviceUUID("add-advertised-service-id-here"); //Advertised Service ID
@@ -177,12 +177,10 @@ void turnOff() {
   first_start = true;
 }
 
-void(* resetFunc) (void) = 0;
-
 void resetEsp() {
   Serial.println("Resetting.. Goodbye"); 
   digitalWrite(LED_BUILTIN, LOW);
-  resetFunc();
+  esp_restart();
 }
 
 void setup() {
@@ -192,21 +190,21 @@ void setup() {
   button1.onPressed(onPressed1); 
   button2.onPressed(onPressed2); 
   button1.onPressedFor(1500, turnOff); 
-  button2.onPressedFor(3000, resetEsp);     
+  button2.onPressedFor(1500, resetEsp);     
   Serial.begin(115200);
-  delay(3000);
+  delay(5000); //get the LEDs a chance to start
   Serial.println("Starting Arduino BLE Client application...");
   BLEDevice::init("");
 
   // Retrieve a Scanner and set the callback we want to use to be informed when we
   // have detected a new device.  Specify that we want active scanning and start the
-  // scan to run for 5 seconds.
+  // scan to run for 10 seconds.
   BLEScan* pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
   pBLEScan->setInterval(1349);
   pBLEScan->setWindow(449);
   pBLEScan->setActiveScan(true);
-  pBLEScan->start(5, false);
+  pBLEScan->start(10, false);
 } // End of setup.
 
 void loop() {
@@ -225,8 +223,6 @@ void loop() {
     }
     doConnect = false;
   }
-  // If we are connected to a peer BLE Server, update the characteristic each time we are reached
-  // with the current time since boot.
   if (connected) {
   }else if(doScan){
     BLEDevice::getScan()->start(0);  // this is just example to start scan after disconnect, most likely there is better way to do it in arduino
