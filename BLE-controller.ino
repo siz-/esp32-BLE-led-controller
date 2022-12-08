@@ -8,9 +8,11 @@
 
 #include "BLEDevice.h"
 #include <EasyButton.h>
+#define uS_TO_S_FACTOR 1000000ULL  /* Conversion factor for micro seconds to seconds */
+#define TIME_TO_SLEEP  1        /* Time ESP32 will go to sleep (in seconds) */
 
-EasyButton button1(15, 50); //button 1 on Pin 15 - debounce 50 ms
-EasyButton button2(13, 50); //button 2 on Pin 13 - debounce 50 ms
+EasyButton button1(15, 50);
+EasyButton button2(13, 50);
 
 // The remote services we wish to connect to.
 static BLEUUID serviceUUID("add-advertised-service-id-here"); //Advertised Service ID
@@ -180,7 +182,8 @@ void turnOff() {
 void resetEsp() {
   Serial.println("Resetting.. Goodbye"); 
   digitalWrite(LED_BUILTIN, LOW);
-  esp_restart();
+  //esp_restart();
+  esp_deep_sleep_start();
 }
 
 void setup() {
@@ -192,19 +195,20 @@ void setup() {
   button1.onPressedFor(1500, turnOff); 
   button2.onPressedFor(1500, resetEsp);     
   Serial.begin(115200);
+  esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR); //Sleep for 2 seconds
   delay(5000); //get the LEDs a chance to start
   Serial.println("Starting Arduino BLE Client application...");
   BLEDevice::init("");
 
   // Retrieve a Scanner and set the callback we want to use to be informed when we
   // have detected a new device.  Specify that we want active scanning and start the
-  // scan to run for 10 seconds.
+  // scan to run for indefinitely until connected.
   BLEScan* pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
   pBLEScan->setInterval(1349);
   pBLEScan->setWindow(449);
   pBLEScan->setActiveScan(true);
-  pBLEScan->start(10, false);
+  pBLEScan->start(0, false);
 } // End of setup.
 
 void loop() {
