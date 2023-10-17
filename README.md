@@ -1,11 +1,7 @@
-# esp32-BLE-led-controller
+A script that utilizes the esp32 for controlling chinese LED ARGB controllers that use the BLE/LEDLAMP app.
 
-A small script that utilizes the esp32 for controlling chinese aftermarket LED strips that uses the BLE app/LEDLAMP app with hardware buttons.
+Dependencies: Arduino IDE with esp32 installed, EasyButton, NimBLE and Preferences library. BLE device address, BLE Service and characteristic IDs of your device (use BlueLight on Android).
 
-Dependencies: Arduino IDE with esp32 installed and EasyButton library. BLE Service and characteristic IDs of your device (use fx BlueLight on Android). 
-
-Thanks to kquinsland and arduino12 for their work on deciphering the inner workings of the controllers:
-
+Inspiration:
 https://github.com/kquinsland/JACKYLED-BLE-RGB-LED-Strip-controller
-
 https://github.com/arduino12/ble_rgb_led_strip_controller
