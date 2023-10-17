@@ -1,4 +1,4 @@
-A script that utilizes the esp32 for controlling chinese LED ARGB controllers that use the BLE/LEDLAMP app.
+A script that utilizes the esp32 for controlling chinese LED aRGB controllers that use the BLE/LEDLAMP app.
 
 Dependencies: Arduino IDE with esp32 installed, EasyButton, NimBLE and Preferences library. BLE device address, BLE Service and characteristic IDs of your device (use BlueLight on Android).
 
