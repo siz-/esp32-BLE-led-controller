@@ -5,10 +5,12 @@ Rotary Encoder 1: aRGB strip control (single press to change mode)
   - Mode 1: Custom animation and color change (23)
   - Mode 2: Preinstalled animations (209)
   - Long press: shutdown in mode 1, reset animation in mode 2
+    
 Rotary Encoder 2: RGB strip control
   - Mode 1: color change (10)
   - Mode 2 global color change (10)
   - Long press: shutdown. Goes to sleep for 10 seconds if encoder 1 = mode 2 and encoder 2 = mode 2 and encoder 3 =  mode 3, so user can connect to controller via phone
+    
 Rotary Encoder 3: brightness control
   - Mode 1: Global control
   - Mode 2: aRGB control
