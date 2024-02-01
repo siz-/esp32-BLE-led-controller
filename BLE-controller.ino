@@ -66,6 +66,8 @@ int effect_2;
 int toggle_1;
 int toggle_2;
 int toggle_3;
+bool off_1;
+bool off_2;
 
 void gradientFunction(uint8_t rgb[][3], int length) {
   uint8_t bytes[9] = {0x7b, 0xff, 0x04, 0x00, 0xff, 0xff, 0xff, 0xff, 0xbf}; //turn off
@@ -320,7 +322,7 @@ void turnOff() {
 } 
 
 void btn1() {
-  if (turnOn() == true) {
+  if ((turnOn() == true) || (off_2 == true)) {
     return;
   } else {
   toggle_1++;
@@ -344,7 +346,7 @@ void btn1() {
 }
 
 void btn1long() {
-  if (turnOn() == true) {
+  if ((turnOn() == true) || (off_2 == true)) {
     return;
   } else {  
     if (toggle_1 == 1) {
@@ -363,7 +365,7 @@ void btn1long() {
 }
 
 void btn2() {
-   if (turnOn() == true) {
+   if ((turnOn() == true) || (off_1 == true)) {
     return;
   } else {
     toggle_2++;
@@ -395,7 +397,7 @@ void btn2() {
 }
 
 void btn2long() {
-  if (turnOn() == true) {
+  if ((turnOn() == true) || (off_1 == true)) {
     return;
   } else {  
       if ((toggle_1 == 1) && (toggle_2 = 1) && (toggle_3 == 2)) {
@@ -419,7 +421,35 @@ void btn2long() {
     }    
   }
 } 
- 
+
+void turnOffaRGB() {
+    if (off_2) {
+    uint8_t bytes[9] = {0x7b, 0xff, 0x04, 0x00, 0xff, 0xff, 0xff, 0xff, 0xbf}; //turn off
+    pRemoteCharacteristic->writeValue(bytes, 9);
+    encoder1.pauseCount();
+  } else {      
+    uint8_t bytes[9] = {0x7b, 0xff, 0x04, 0x01, 0xff, 0xff, 0xff, 0xff, 0xbf}; //turn on
+    pRemoteCharacteristic->writeValue(bytes, 9);
+    delay(50);
+    pRemoteCharacteristic->writeValue(bytes, 9);
+    encoder1.resumeCount();
+  }
+}
+
+void turnOffRGB() {
+  if (off_1) {
+    uint8_t bytes[9] = {0x7e, 0xff, 0x04, 0x00, 0xff, 0xff, 0xff, 0xff, 0xef}; //turn off
+    pRemoteCharacteristic->writeValue(bytes, 9);  
+    encoder2.pauseCount();
+} else {
+    uint8_t bytes[9] = {0x7e, 0xff, 0x04, 0x01, 0xff, 0xff, 0xff, 0xff, 0xef}; //turn on
+    pRemoteCharacteristic->writeValue(bytes, 9);  
+    delay(50);
+    pRemoteCharacteristic->writeValue(bytes, 9);
+    encoder2.resumeCount();
+}
+}
+
 void btn3() {
   if (turnOn() == true) {
     return;
@@ -444,6 +474,10 @@ void btn3() {
           encoder3.setCount((gbright / 5) * 2);
         }
         toggle_3 = 0;
+        off_1 = false;
+        off_2 = false;
+        turnOffaRGB();
+        turnOffRGB();
         break;
       }
     }
@@ -453,6 +487,25 @@ void btn3() {
     #endif
     preferences.putInt("toggle_3", toggle_3);
     }
+}
+
+void btn3long () {
+  switch (toggle_3) {
+    case 0: {
+      turnOff();
+      break;
+    }
+    case 1: {
+        off_2 = !off_2;
+        turnOffaRGB();
+        break;
+    }
+    case 2: {
+        off_1 = !off_1;
+        turnOffRGB();
+        break;
+    }
+  }
 }
 
 void encoder1Loop () {
@@ -530,7 +583,7 @@ long newPosition = (encoder2.getCount() / 2) * stepSize;
 }
 
 void encoder3Loop () {
-long minVal = 15;
+long minVal = 10;
 long maxVal = 100;
 long stepSize = 5;
 
@@ -553,9 +606,9 @@ long newPosition = (encoder3.getCount() / 2) * stepSize;
             #if DEBUG == 1
             Serial.print("Brightness: ");
             #endif
-            break;
+            break;         
           }
-          case 1: { //aRGB
+          case 1: { //aRGB         
             bright_1 = newPosition;
             uint8_t bytes[9] = {0x7b, 0x00, 0x01, 0x00, newPosition, 0x00, 0xff, 0xff, 0xbf}; 
             pRemoteCharacteristic->writeValue(bytes, 9);
@@ -564,8 +617,9 @@ long newPosition = (encoder3.getCount() / 2) * stepSize;
             Serial.print("aRGB Brightness: ");
             #endif
             break;
+            
           }
-          case 2: { //RGB
+          case 2: { //RGB          
             bright_2 = newPosition;
             uint8_t bytes[9] = {0x7e, 0xff, 0x01, newPosition, 0x00, 0xff, 0xff, 0xff, 0xef}; 
             pRemoteCharacteristic->writeValue(bytes, 9);
@@ -574,7 +628,7 @@ long newPosition = (encoder3.getCount() / 2) * stepSize;
             Serial.print("RGB Brightness: ");
             #endif
             break;
-          }
+            }
         }
         #if DEBUG == 1
         Serial.println(newPosition);
@@ -596,6 +650,8 @@ effect_2 = preferences.getInt("effect_2", 0);
 toggle_1 = preferences.getInt("toggle_1", 0);
 toggle_2 = preferences.getInt("toggle_2", 0);
 toggle_3 = preferences.getInt("toggle_3", 0);
+off_1 = preferences.getBool("off_1", false);
+off_2 = preferences.getBool("off_2", false);
 }
 
 void loadEncoderValues () {
@@ -651,7 +707,7 @@ void setup() {
   Button2.onPressed(btn2);
   Button2.onPressedFor(1000, btn2long);
   Button3.onPressed(btn3);
-  Button3.onPressedFor(1000, turnOff);
+  Button3.onPressedFor(1000, btn3long);
     //NimBLE
   delay(4000); //Startup is too fast for the LED controller to handle :)
   #if DEBUG == 1
