@@ -15,7 +15,7 @@ Rotary Encoder 3: brightness control
   - Mode 1: Global control
   - Mode 2: aRGB control
   - Mode 3: RGB control
-  - Long press: shutdown
+  - Long press: shutdown in mode 1. In mode 2 and 3, each zone shuts off independently of each other.
 
 The script saves state. Now jumps between colors when switching, it resets LEDs at startup to avoid garbage data and more.
 
